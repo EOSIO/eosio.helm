@@ -1,0 +1,162 @@
+{{- $componentName := "nodeos" -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "common.nodeosName" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "common.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $componentName }}
+    {{- if .Values.global.expires }}
+    expires: {{ .Values.global.expiry }}
+    {{- end }}
+    app: {{ $componentName }}
+spec:
+  serviceName: {{ include "common.nodeosName" . }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "common.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ $componentName }}
+      app: {{ $componentName }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ include "common.nodeosName" . }}-pv
+        namespace: {{ .Values.global.namespace }}
+        labels:
+          {{- include "common.selectorLabels" . | nindent 10 }}
+          app.kubernetes.io/component: {{ $componentName }}
+      spec:
+        storageClassName: {{ include "common.storageClass" . }}
+        resources:
+          requests:
+            storage: {{ .Values.pvSize | default "100Gi" }}
+        accessModes:
+          - ReadWriteOnce
+  template:
+    metadata:
+      labels:
+        {{- include "common.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ $componentName }}
+        app: {{ $componentName }}
+      annotations:
+        consul.hashicorp.com/connect-inject: "false"
+    spec:
+      serviceAccountName: {{ include "common.nodeosName" . }}
+      containers:
+      - name: {{ include "common.nodeosName" . }}
+        image: {{ include "common.nodeosContainer" . }}
+        imagePullPolicy: {{ .Values.global.containers.pullPolicy }}
+        env:
+        - name: BUILD_TAG
+          value: bp-{{ .Values.global.instance }}
+        command: ["/bin/sh", "-ce", "nodeos \
+          --genesis-json /root/.local/share/eosio/nodeos/config/genesis.json \
+          --http-validate-host=0 \
+          --max-irreversible-block-age=-1 \
+          --contracts-console \
+          --logconf /root/.local/share/eosio/nodeos/config/log/logging.json \
+          --signature-cpu-billable-pct=0 \
+          --last-block-cpu-effort-percent=100 \
+          --last-block-time-offset-us=0 \
+          --cpu-effort-percent=100 \
+          --produce-time-offset-us=0 \
+          --max-clients=10 \
+          --p2p-max-nodes-per-host=99999 \
+          --enable-stale-production \
+          --disable-replay-opts \
+          --agent-name 'block producer agent' \
+          --sync-fetch-span=1000 \
+          --verbose-http-errors \
+          --wasm eos-vm-jit \
+          --plugin eosio::producer_plugin \
+          --plugin eosio::producer_api_plugin \
+          --plugin eosio::state_history_plugin \
+          --trace-history \
+          --chain-state-history \
+          --state-history-endpoint=0.0.0.0:8082 \
+          --plugin eosio::chain_api_plugin \
+          --plugin eosio::http_plugin \
+          --producer-name eosio \
+          --http-server-address=0.0.0.0:8080 \
+          --p2p-listen-endpoint=0.0.0.0:8081 \
+          --p2p-accept-transactions=true \
+          --data-dir /mnt/dev/data \
+          --abi-serializer-max-time-ms=1000000000 \
+          --max-body-size=1000000000 \
+          --max-transaction-time=475 \
+          --http-max-response-time-ms=1000000000 \
+          --access-control-allow-origin '*' \
+          --access-control-allow-headers '*' \
+          --access-control-allow-credentials"]
+        readinessProbe:
+          httpGet:
+            path: /v1/chain/get_info
+            port: http-api
+          initialDelaySeconds: 5
+          periodSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: /v1/chain/get_info
+            port: http-api
+          initialDelaySeconds: 5
+          periodSeconds: 3
+        startupProbe:
+          httpGet:
+            path: /v1/chain/get_info
+            port: http-api
+          failureThreshold: 30
+          periodSeconds: 10
+        ports:
+        - name: http-api
+          containerPort: 8080
+        - name: tcp-peer
+          containerPort: 8081
+        - name: http-hist
+          containerPort: 8082
+        {{- if ne .Values.global.namespace "local" }}
+        resources:
+          requests:
+            cpu: 3
+            memory: '12G'
+          limits:
+            cpu: 3
+            memory: '12G'
+        {{- end }}
+        volumeMounts:
+        - name: genesis
+          mountPath: /root/.local/share/eosio/nodeos/config
+          readOnly: true
+        - name: logging
+          mountPath: /root/.local/share/eosio/nodeos/config/log
+        - mountPath: /root/.local/share/eosio/nodeos/config/protocol_features
+          name: protocol-features
+        - name: {{ include "common.nodeosName" . }}-pv
+          mountPath: /mnt/dev/data
+      volumes:
+      - name: genesis
+        configMap:
+          name: {{ include "common.nodeosName" . }}
+      - name: logging
+        configMap:
+          name: {{ include "common.nodeosName" . }}-logging
+      - name: protocol-features
+        emptyDir: {}
+      terminationGracePeriodSeconds: 120
+      {{- if .Values.global.containers.pullSecrets }}
+      imagePullSecrets:
+        - name: {{ .Values.global.containers.pullSecrets }}
+      {{- end }}
+      {{- if .Values.global.nodeSelector }}
+      nodeSelector:
+        {{- if ne .Values.global.cloudProvider "gcp" }}
+        node-role: {{ .Values.global.nodeSelector }}
+        {{- else }}
+        cloud.google.com/gke-nodepool: {{ .Values.global.nodeSelector }}
+      tolerations:
+        - key: nodepool
+          operator: Equal
+          value: {{ .Values.global.nodeSelector }}
+          effect: NoSchedule
+        {{- end }}
+      {{- end }}

@@ -1,0 +1,45 @@
+{{- $componentName := "nodeos" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.nodeosName" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "common.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $componentName }}
+    {{- if .Values.global.expires }}
+    expires: {{ .Values.global.expiry }}
+    {{- end }}
+    app: {{ $componentName }}
+spec:
+  selector:
+    {{- include "common.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $componentName }}
+    app: {{ $componentName }}
+  ports:
+    - name: http-api
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+      {{- if .Values.global.containers.nodeos.nodeport }}
+      nodePort: {{ .Values.global.containers.nodeos.nodeport }}
+      {{- end }}
+    - name: tcp-peer
+      protocol: TCP
+      port: 81
+      targetPort: 8081
+      {{- if .Values.global.containers.nodeos.p2pport }}
+      nodePort: {{ .Values.global.containers.nodeos.p2pport }}
+      {{- end }}
+    - name: http-hist
+      protocol: TCP
+      port: 82
+      targetPort: 8082
+      {{- if .Values.global.containers.nodeos.histport }}
+      nodePort: {{ .Values.global.containers.nodeos.histport }}
+      {{- end }}
+  {{- if or (.Values.global.containers.nodeos.p2pport) (.Values.global.containers.nodeos.histport) (.Values.global.containers.nodeos.nodeport) }}
+  type: NodePort
+  {{- else }}
+  type: ClusterIP
+  {{- end }}

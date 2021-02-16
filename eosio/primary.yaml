@@ -1,0 +1,19 @@
+global:
+  containers:
+    location: ap-southeast-1
+    pullPolicy: IfNotPresent
+    nodeos:
+      testAccountsJson: accounts.json
+  instance: primary
+  namespace: primary
+  monitoring:
+    namespace: monitoring
+    enabled: false
+  localLB: true
+  pvsEnabled: true
+  nodeSelector: primary
+  cloudProvider: gcp
+
+nodeSelector: primary
+nodeos:
+  # noop

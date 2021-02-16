@@ -1,0 +1,13 @@
+{{- $componentName := "nodeos-config" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.nodeosName" . }}-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "common.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $componentName }}
+    {{- if .Values.global.expires }}
+    expires: {{ .Values.global.expiry }}
+    {{- end }}
+data:

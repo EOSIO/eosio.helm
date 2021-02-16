@@ -1,0 +1,3 @@
+# `helm dependency update` artifacts
+Chart.lock
+*.tgz

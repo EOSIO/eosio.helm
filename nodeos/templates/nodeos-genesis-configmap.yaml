@@ -1,0 +1,17 @@
+{{- $componentName := "nodeos-genesis-config" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.nodeosName" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "common.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ $componentName }}
+    {{- if .Values.global.expires }}
+    expires: {{ .Values.global.expiry }}
+    {{- end }}
+data:
+  genesis.json: |-
+{{ .Files.Get "files/genesis.json" | indent 4 }}
+  config.ini: |-
+    # no-op
