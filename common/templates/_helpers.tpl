@@ -99,7 +99,7 @@ Generate container
       {{ required (printf "Local source chosen but no image provided for the service.") nil }}
     {{- end -}}
   {{- else if (eq .containerRepo "dockerhub") -}}
-    {{ include "common.containerPrefix" . }}{{ .serviceName }}:{{ .containerTag }}
+    {{ include "common.containerPrefix" . }}/{{ .serviceName }}:{{ .containerTag }}
   {{- else -}}
     {{ required (printf "Must provide a valid source for image.") nil }}
   {{- end -}}
@@ -114,7 +114,7 @@ Containers
 {{- end -}}
 
 {{- define "common.nodeosContainer" -}}
-  {{ template "common.container" (dict "Values" .Values "containerRepo" .Values.global.containers.eos.containerRepo "containerTag" .Values.global.containers.eos.containerTag "serviceName" "eos" "localImage" .Values.global.localEosImage ) }}
+  {{ template "common.container" (dict "Values" .Values "containerRepo" .Values.global.containers.eosio.containerRepo "containerTag" .Values.global.containers.eosio.containerTag "serviceName" "eosio" "localImage" .Values.global.localEosioImage ) }}
 {{- end -}}
 
 

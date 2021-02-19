@@ -1,6 +1,7 @@
 global:
   containers:
-    eos:
+    dockerhub: "eosio"
+    eosio:
       containerRepo: dockerhub
       containerTag: develop
     initContainer:
