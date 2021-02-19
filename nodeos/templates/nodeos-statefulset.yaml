@@ -21,7 +21,7 @@ spec:
       app: {{ $componentName }}
   volumeClaimTemplates:
     - metadata:
-        name: {{ include "common.nodeosName" . }}-pv
+        name: pvc
         namespace: {{ .Values.global.namespace }}
         labels:
           {{- include "common.selectorLabels" . | nindent 10 }}
@@ -131,7 +131,7 @@ spec:
           mountPath: /root/.local/share/eosio/nodeos/config/log
         - mountPath: /root/.local/share/eosio/nodeos/config/protocol_features
           name: protocol-features
-        - name: {{ include "common.nodeosName" . }}-pv
+        - name: pvc
           mountPath: /mnt/dev/data
       volumes:
       - name: genesis
