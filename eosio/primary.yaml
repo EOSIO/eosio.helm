@@ -1,5 +1,11 @@
 global:
   containers:
+    eos:
+      containerRepo: dockerhub
+      containerTag: master
+    initContainer:
+      containerRepo: dockerhub
+      containerTag: master
     location: ap-southeast-1
     pullPolicy: IfNotPresent
     nodeos:

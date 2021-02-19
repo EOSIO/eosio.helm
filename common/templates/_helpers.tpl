@@ -75,6 +75,38 @@ Storage Class
 
 
 {{/*
+Generate container prefix
+*/}}
+{{- define "common.containerPrefix" -}}
+  {{- if eq .containerRepo "dockerhub" -}}
+    {{ .Values.global.containers.dockerhub }}
+  {{- else }}
+    {{ required (printf "Must provide a supported region") nil }}
+  {{- end -}}
+{{- end -}}
+
+
+{{/*
+Generate container
+*/}}
+{{- define "common.container" -}}
+  {{- if eq .containerRepo "local" -}}
+    {{- if .localImage -}}
+      {{ .localImage }}
+    {{- else if .Values.global.dryRun -}}
+      local
+    {{- else -}}
+      {{ required (printf "Local source chosen but no image provided for the service.") nil }}
+    {{- end -}}
+  {{- else if (eq .containerRepo "dockerhub") -}}
+    {{ include "common.containerPrefix" . }}{{ .serviceName }}:{{ .containerTag }}
+  {{- else -}}
+    {{ required (printf "Must provide a valid source for image.") nil }}
+  {{- end -}}
+{{- end -}}
+
+
+{{/*
 Containers
 */}}
 {{- define "common.initContainer" -}}
