@@ -1,16 +1,18 @@
 global:
   containers:
-    eos:
+    dockerhub: "eosio"
+    eosio:
       containerRepo: dockerhub
       containerTag: master
     initContainer:
       containerRepo: dockerhub
       containerTag: master
-    location: ap-southeast-1
+    location: us-west-2
     pullPolicy: IfNotPresent
     nodeos:
       testAccountsJson: accounts.json
   instance: primary
+  branch: master
   namespace: primary
   monitoring:
     namespace: monitoring
@@ -18,8 +20,6 @@ global:
   localLB: true
   pvsEnabled: true
   nodeSelector: primary
-  cloudProvider: gcp
+  cloudProvider: aws
 
 nodeSelector: primary
-nodeos:
-  # noop

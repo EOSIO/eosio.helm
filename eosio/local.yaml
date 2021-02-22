@@ -7,7 +7,6 @@ global:
     initContainer:
       containerRepo: dockerhub
       containerTag: develop
-    location: ap-southeast-1
     pullPolicy: IfNotPresent
     nodeos:
       adminport: 31888
