@@ -19,7 +19,5 @@ global:
     enabled: false
   localLB: true
   pvsEnabled: true
-  nodeSelector: primary
+  nodeSelector: heavy-node
   cloudProvider: aws
-
-nodeSelector: primary
