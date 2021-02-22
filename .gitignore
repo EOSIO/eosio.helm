@@ -1,3 +1,6 @@
 # `helm dependency update` artifacts
 Chart.lock
 *.tgz
+
+# local script output
+pipeline.yml
