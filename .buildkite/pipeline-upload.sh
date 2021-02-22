@@ -8,7 +8,7 @@ steps:
 
 EOF
 # find all helm deployments
-for HELM_DEPLOY_SCRIPT in $(find scripts -maxdepth 1 -name 'deploy*.sh'); do
+for HELM_DEPLOY_SCRIPT in $(find eosio/scripts -maxdepth 1 -name 'deploy*.sh'); do
     # echo "HELM_DEPLOY_SCRIPT='$HELM_DEPLOY_SCRIPT'"
     # derive deployment name from HELM_DEPLOY_SCRIPT path
     DEPLOYMENT_NAME="$(basename "$HELM_DEPLOY_SCRIPT" | sed 's/^deploy-//' | sed 's/\.sh$//')"
