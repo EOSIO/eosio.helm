@@ -7,15 +7,18 @@ steps:
   - wait
 
 EOF
+
+SCRIPT_PATH='eosio/scripts'
+
 # find all helm deployments
-for HELM_DEPLOY_SCRIPT in $(find eosio/scripts -maxdepth 1 -name 'deploy*.sh'); do
+for HELM_DEPLOY_SCRIPT in $(find "$SCRIPT_PATH" -maxdepth 1 -name 'deploy*.sh'); do
     # echo "HELM_DEPLOY_SCRIPT='$HELM_DEPLOY_SCRIPT'"
     # derive deployment name from HELM_DEPLOY_SCRIPT path
     DEPLOYMENT_NAME="$(basename "$HELM_DEPLOY_SCRIPT" | sed 's/^deploy-//' | sed 's/\.sh$//')"
     cat >> pipeline.yml <<EOF
 
   - label: ":helm: Verify Helm Charts - $DEPLOYMENT_NAME"
-    command: "$HELM_DEPLOY_SCRIPT"
+    command: "$SCRIPT_PATH/helm-dependency-update.sh && $HELM_DEPLOY_SCRIPT"
     agents:
       queue: "automation-eks-helm3-deployer-fleet"
     concurrency: 1
