@@ -1,0 +1,13 @@
+nodeos:
+  config:
+    placeholder: "-"
+  plugin:
+    placeholder: "-"
+    chain:
+      placeholder: "-"
+    http:
+      placeholder: "-"
+    net:
+      placeholder: "-"
+    producer:
+      placeholder: "-"
