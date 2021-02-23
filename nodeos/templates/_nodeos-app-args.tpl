@@ -1,48 +1,38 @@
 {{- define "nodeos.arg_list" -}}
---genesis-json /root/.local/share/eosio/nodeos/config/genesis.json
---http-validate-host=0
---max-irreversible-block-age=-1
---contracts-console
---logconf /root/.local/share/eosio/nodeos/config/log/logging.json
---signature-cpu-billable-pct=0
---last-block-cpu-effort-percent=100
---last-block-time-offset-us=0
---cpu-effort-percent=100
---produce-time-offset-us=0
---max-clients=10
---p2p-max-nodes-per-host=99999
+--genesis-json {{ default "/root/.local/share/eosio/nodeos/config/genesis.json" .Values.nodeos.plugin.chain.genesis_json }}
+--http-validate-host {{ default 0 .Values.nodeos.plugin.http.http_validate_host }}
+--max-irreversible-block-age {{ default -1 .Values.nodeos.plugin.producer.max_irreversible_block_age }}
+{{- if .Values.nodeos.plugin.net.max_clients -}}
+--max-clients {{ .Values.nodeos.plugin.net.max_clients }}
+{{- end -}}
+{{- if .Values.nodeos.plugin.net.p2p_max_nodes_per_host -}}
+--p2p-max-nodes-per-host {{ .Values.nodeos.plugin.net.p2p_max_nodes_per_host }}
+{{- end -}}
+{{- if .Values.nodeos.plugin.producer.enable_stale_production -}}
 --enable-stale-production
+{{- end -}}
+{{- if .Values.nodeos.plugin.chain.disable_replay_opts -}}
 --disable-replay-opts
---agent-name 'block producer agent'
---sync-fetch-span=1000
---verbose-http-errors
---wasm eos-vm-jit
+{{- end -}}
+{{- if .Values.nodeos.plugin.net.agent_name -}}
+--agent-name {{ .Values.nodeos.plugin.net.agent_name }}
+{{- end -}}
+--wasm-runtime {{ default "eos-vm-jit" .Values.nodeos.plugin.chain.wasm_runtime }}
 --plugin eosio::producer_plugin
 --plugin eosio::producer_api_plugin
---plugin eosio::state_history_plugin
---trace-history
---chain-state-history
---state-history-endpoint=0.0.0.0:8082
 --plugin eosio::chain_api_plugin
 --plugin eosio::http_plugin
---producer-name eosio
---http-server-address=0.0.0.0:8080
---p2p-listen-endpoint=0.0.0.0:8081
---p2p-accept-transactions=true
---data-dir /mnt/dev/data
---abi-serializer-max-time-ms=1000000000
---max-body-size=1000000000
---max-transaction-time=475
---http-max-response-time-ms=1000000000
---access-control-allow-origin '*'
---access-control-allow-headers '*'
---access-control-allow-credentials
+--producer-name {{ default "eosio" .Values.nodeos.plugin.producer.producer_name }}
+--http-server-address {{ default "0.0.0.0:8080" .Values.nodeos.plugin.http.http_server_address }}
+--p2p-listen-endpoint {{ default "0.0.0.0:8081" .Values.nodeos.plugin.net.p2p_listen_endpoint }}
+--p2p-accept-transactions {{ default true .Values.nodeos.plugin.net.p2p_accept_transactions }}
+--data-dir {{ default "/mnt/dev/data" .Values.nodeos.config.data_dir }}
 {{- end -}}
 
 {{- define "nodeos.args" -}}
-{{ include "nodeos.arg_list" . | replace "\n" " "}}
+{{ include "nodeos.arg_list" . | replace "\n" " " }}
 {{- end -}}
 
 {{- define "nodeos.command" -}}
-{{ printf "\"nodeos %s\""  (include "nodeos.args" .) }}
+{{ printf "nodeos %s"  (include "nodeos.args" .) }}
 {{- end -}}
