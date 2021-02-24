@@ -24,6 +24,3 @@ global:
   branch: local
   loadBalancerSourceRange: 0.0.0.0/0
   cloudProvider: local
-
-nodeos:
-  pvSize: 1Gi

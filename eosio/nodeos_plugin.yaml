@@ -1,13 +1,13 @@
-nodeos:
-  config:
-    placeholder: "-"
-  plugin:
-    placeholder: "-"
-    chain:
-      placeholder: "-"
-    http:
-      placeholder: "-"
-    net:
-      placeholder: "-"
-    producer:
-      placeholder: "-"
+global:
+  nodeos:
+    config:
+      enabled: true
+    plugin:
+      chain:
+        enabled: true
+      http:
+        enabled: true
+      net:
+        enabled: true
+      producer:
+        enabled: true
