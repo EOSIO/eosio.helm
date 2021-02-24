@@ -1,3 +1,5 @@
+namespace: &namespace_anchor local
+
 global:
   containers:
     dockerhub: "eosio"
@@ -14,13 +16,13 @@ global:
       p2pport: 30887
       nodeport: 30888
       testAccountsJson: minimal.json
-  namespace: local
+  namespace: *namespace_anchor
   monitoring:
     namespace: monitoring
     enabled: false
   localLB: true
   pvsEnabled: false
-  instance: local
-  branch: local
+  instance: *namespace_anchor
+  branch: *namespace_anchor
   loadBalancerSourceRange: 0.0.0.0/0
-  cloudProvider: local
+  cloudProvider: *namespace_anchor

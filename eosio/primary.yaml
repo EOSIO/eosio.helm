@@ -1,3 +1,5 @@
+namespace: &namespace_anchor primary
+
 global:
   containers:
     dockerhub: "eosio"
@@ -11,9 +13,9 @@ global:
     pullPolicy: IfNotPresent
     nodeos:
       testAccountsJson: accounts.json
-  instance: primary
+  instance: *namespace_anchor
   branch: master
-  namespace: primary
+  namespace: *namespace_anchor
   monitoring:
     namespace: monitoring
     enabled: false
