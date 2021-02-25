@@ -11,14 +11,21 @@ for directory in `ls -d eosio*`; do
   helm package $directory
 done
 
+original_index="index.yaml.orig"
+index="index.yaml"
+
+aws s3 cp s3://$EOSIO_HELM_CHART_REPO_BUCKET/$index $original_index
+
 for package in `ls -f *.tgz`; do
-  aws s3 cp $package s3://$EOSIO_HELM_CHART_REPO_BUCKET
+  if [[ -z `cat $original_index | grep $package` ]]; then
+    aws s3 cp $package s3://$EOSIO_HELM_CHART_REPO_BUCKET
+  else
+    rm $package
+  fi
 done
 
-aws s3 cp s3://$EOSIO_HELM_CHART_REPO_BUCKET/index.yaml index.yaml.orig
+helm repo index --merge $original_index .
 
-helm repo index --merge index.yaml.orig .
-
-aws s3 cp index.yaml s3://$EOSIO_HELM_CHART_REPO_BUCKET/index.yaml
+aws s3 cp $index s3://$EOSIO_HELM_CHART_REPO_BUCKET/$index
 
 echo '+++ :white_check_mark: Done! Good luck :)'
