@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # Order here matters
-DEP_TREE=('common' 'nodeos' 'eosio')
+DEP_TREE=('eosio-common' 'eosio-nodeos' 'eosio')
 
 for chart in "${DEP_TREE[@]}"; do
   pushd $chart

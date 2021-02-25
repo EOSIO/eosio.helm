@@ -21,6 +21,6 @@ version: 0.1.0
 appVersion: 0.1.0
 
 dependencies:
-  - name: nodeos
+  - name: eosio-nodeos
     version: ~0.1.0
-    repository: file://../nodeos
+    repository: file://../eosio-nodeos

@@ -21,6 +21,6 @@ version: 0.1.0
 appVersion: 0.1.0
 
 dependencies:
-  - name: common
+  - name: eosio-common
     version: ~0.1.0
-    repository: file://../common
+    repository: file://../eosio-common
