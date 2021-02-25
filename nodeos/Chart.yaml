@@ -1,6 +1,6 @@
 apiVersion: v2
-name: nodeos
-description: A Helm chart for nodeos.
+name: eosio-nodeos
+description: A Helm chart for eosio nodeos.
 
 # A chart can be either an 'application' or a 'library' chart.
 #
