@@ -26,18 +26,16 @@ for HELM_DEPLOY_SCRIPT in $(find "$SCRIPT_PATH" -maxdepth 1 -name 'deploy*.sh');
 EOF
 done
 
-if [[ "$BUILDKITE_BRANCH" == 'master' && -z "$DRY_RUN" ]]; then
-    cat >> pipeline.yml <<EOF
-    - wait
+cat >> pipeline.yml <<EOF
+  - wait
 
-    - label: ":helm: Release Helm Chart updates."
+  - label: ":helm: Release Helm Chart updates."
     command: ".buildkite/perform-release.sh"
     agents:
       queue: "automation-eks-helm3-deployer-fleet"
     concurrency: 1
     concurrency_group: "eosio-helm-$BUILDKITE_BRANCH"
 EOF
-fi
 
 [[ "$DEBUG" == 'true' && "$BUILDKITE" == 'true' ]] && buildkite-agent artifact upload pipeline.yml
 echo '+++ :pipeline_upload: Deploying Pipeline Steps'

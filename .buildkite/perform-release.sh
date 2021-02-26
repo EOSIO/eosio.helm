@@ -2,6 +2,10 @@
 set -eo pipefail
 echo '+++ :helm: Executing Helm package release.'
 
+if [[ "$BUILDKITE_BRANCH" != 'master' ]]; then
+    EOSIO_HELM_CHART_REPO_BUCKET="$EOSIO_HELM_CHART_REPO_BUCKET-test"
+fi
+
 command="test -n \"$EOSIO_HELM_CHART_REPO_BUCKET\""
 echo $command
 eval $command
@@ -34,8 +38,11 @@ for package in `ls -f *.tgz`; do
     if [[ -z `cat $original_index | grep $package` ]]; then
         echo "Uploading package to repo."
         command="aws s3 cp $package s3://$EOSIO_HELM_CHART_REPO_BUCKET"
-        echo $command
-        eval $command
+        if [[ -z "$DRY_RUN" ]]; then
+            eval $command
+        else
+	    echo "Skipping \"$command\""
+        fi
     else
         echo "Not indexing package that already exists in the repo."
         command="rm $package"
@@ -52,6 +59,10 @@ eval $command
 
 command="aws s3 cp $index s3://$EOSIO_HELM_CHART_REPO_BUCKET/$index"
 echo $command
-eval $command
+if [[ -z "$DRY_RUN" ]]; then
+    eval $command
+else
+    echo "Skipping \"$command\""
+fi
 
 echo '+++ :white_check_mark: Done! Good luck :)'
