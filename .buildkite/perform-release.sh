@@ -2,13 +2,14 @@
 set -eo pipefail
 echo '+++ :helm: Executing Helm package release.'
 
-command="test -n \"$EOSIO_HELM_CHART_REPO_BUCKET\""
+bucket="$EOSIO_HELM_CHART_REPO_BUCKET"
+if [[ "$BUILDKITE_BRANCH" != 'master' ]]; then
+    bucket="$EOSIO_HELM_CHART_REPO_TEST_BUCKET"
+fi
+
+command="test -n \"$bucket\""
 echo $command
 eval $command
-
-if [[ "$BUILDKITE_BRANCH" != 'master' ]]; then
-    EOSIO_HELM_CHART_REPO_BUCKET="$EOSIO_HELM_CHART_REPO_BUCKET-test"
-fi
 
 echo ""
 echo "- Updating subcharts."
@@ -30,8 +31,8 @@ index="index.yaml"
 
 echo ""
 echo "- Evaluating existing repo index."
-if [[ -n `aws s3 ls s3://$EOSIO_HELM_CHART_REPO_BUCKET/$index` ]]; then
-    command="aws s3 cp s3://$EOSIO_HELM_CHART_REPO_BUCKET/$index $original_index"
+if [[ -n `aws s3 ls s3://$bucket/$index` ]]; then
+    command="aws s3 cp s3://$bucket/$index $original_index"
     echo $command
     eval $command
 fi
@@ -39,7 +40,7 @@ fi
 for package in `ls -f *.tgz`; do
     if [[ ! -f $original_index || -z `cat $original_index | grep $package` ]]; then
         echo "Uploading package to repo."
-        command="aws s3 cp $package s3://$EOSIO_HELM_CHART_REPO_BUCKET"
+        command="aws s3 cp $package s3://$bucket"
         if [[ -z "$DRY_RUN" ]]; then
             eval $command
         else
@@ -63,7 +64,7 @@ fi
 echo $command
 eval $command
 
-command="aws s3 cp $index s3://$EOSIO_HELM_CHART_REPO_BUCKET/$index"
+command="aws s3 cp $index s3://$bucket/$index"
 echo $command
 if [[ -z "$DRY_RUN" ]]; then
     eval $command
