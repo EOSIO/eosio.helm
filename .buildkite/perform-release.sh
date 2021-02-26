@@ -30,12 +30,14 @@ index="index.yaml"
 
 echo ""
 echo "- Evaluating existing repo index."
-command="aws s3 cp s3://$EOSIO_HELM_CHART_REPO_BUCKET/$index $original_index"
-echo $command
-eval $command
+if [[ -n `aws s3 ls s3://$EOSIO_HELM_CHART_REPO_BUCKET/$index` ]]; then
+    command="aws s3 cp s3://$EOSIO_HELM_CHART_REPO_BUCKET/$index $original_index"
+    echo $command
+    eval $command
+fi
 
 for package in `ls -f *.tgz`; do
-    if [[ -z `cat $original_index | grep $package` ]]; then
+    if [[ ! -f $original_index || -z `cat $original_index | grep $package` ]]; then
         echo "Uploading package to repo."
         command="aws s3 cp $package s3://$EOSIO_HELM_CHART_REPO_BUCKET"
         if [[ -z "$DRY_RUN" ]]; then
@@ -53,7 +55,11 @@ done
 
 echo ""
 echo "- Building updated index."
-command="helm repo index --merge $original_index ."
+if [[ -f $original_index ]]; then
+    command="helm repo index --merge $original_index ."
+else
+    command="helm repo index ."
+fi
 echo $command
 eval $command
 
