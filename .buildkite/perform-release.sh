@@ -2,13 +2,13 @@
 set -eo pipefail
 echo '+++ :helm: Executing Helm package release.'
 
-if [[ "$BUILDKITE_BRANCH" != 'master' ]]; then
-    EOSIO_HELM_CHART_REPO_BUCKET="$EOSIO_HELM_CHART_REPO_BUCKET-test"
-fi
-
 command="test -n \"$EOSIO_HELM_CHART_REPO_BUCKET\""
 echo $command
 eval $command
+
+if [[ "$BUILDKITE_BRANCH" != 'master' ]]; then
+    EOSIO_HELM_CHART_REPO_BUCKET="$EOSIO_HELM_CHART_REPO_BUCKET-test"
+fi
 
 echo ""
 echo "- Updating subcharts."
