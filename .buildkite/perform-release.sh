@@ -15,10 +15,10 @@ eval $command
 echo ""
 echo "- Packaging charts."
 for directory in `ls -d eosio*`; do
-  # TODO sign these packages
-  command="helm package $directory"
-  echo $command
-  eval $command
+    # TODO sign these packages
+    command="helm package $directory"
+    echo $command
+    eval $command
 done
 
 original_index="index.yaml.orig"
@@ -31,17 +31,17 @@ echo $command
 eval $command
 
 for package in `ls -f *.tgz`; do
-  if [[ -z `cat $original_index | grep $package` ]]; then
-    echo "Uploading package to repo."
-    command="aws s3 cp $package s3://$EOSIO_HELM_CHART_REPO_BUCKET"
-    echo $command
-    eval $command
-  else
-    echo "Not indexing package that already exists in the repo."
-    command="rm $package"
-    echo $command
-    eval $command
-  fi
+    if [[ -z `cat $original_index | grep $package` ]]; then
+        echo "Uploading package to repo."
+        command="aws s3 cp $package s3://$EOSIO_HELM_CHART_REPO_BUCKET"
+        echo $command
+        eval $command
+    else
+        echo "Not indexing package that already exists in the repo."
+        command="rm $package"
+        echo $command
+        eval $command
+    fi
 done
 
 echo ""
