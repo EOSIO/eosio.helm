@@ -64,6 +64,15 @@ fi
 echo $command
 eval $command
 
+artifacthub_metadata="artifacthub-repo.yml"
+command="aws s3 cp $artifacthub_metadata s3://$bucket/$artifacthub_metadata"
+echo $command
+if [[ -z "$DRY_RUN" ]]; then
+    eval $command
+else
+    echo "Skipping \"$command\""
+fi
+
 command="aws s3 cp $index s3://$bucket/$index"
 echo $command
 if [[ -z "$DRY_RUN" ]]; then
