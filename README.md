@@ -43,6 +43,16 @@ Helm charts for EOSIO.
 * Cloud provider: `.Values.global.cloudProvider`
 * Autoscaler: `.Values.global.nodeSelector`
 
+## Contributing
+
+[Contributing Guide](./CONTRIBUTING.md)
+
+[Code of Conduct](./CONTRIBUTING.md#conduct)
+
+## License
+
+[MIT](./LICENSE)
+
 ## Important
 
 See [LICENSE](./LICENSE) for copyright and license terms.
