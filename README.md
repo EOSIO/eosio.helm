@@ -1,9 +1,9 @@
 # eosio.helm
-Helm charts for EOSIO.
+[EOSIO](https://github.com/EOSIO/eos) enables businesses to rapidly build and deploy high-performance and high-security blockchain-based applications.
 
-## How to install nodeos via Helm.
+Official support for Helm charts goes one step further! Now deploy EOSIO application(s) via Kubernetes with premade templates.
 
-### How to install via Docker Desktop.
+## How to install and run locally via Docker Desktop.
 
 1. Install Docker Desktop.
     * [Docker Official: Desktop](https://docs.docker.com/desktop)
@@ -14,14 +14,18 @@ Helm charts for EOSIO.
 1. Configure Helm and Kubernetes for deployment.
     1. Helm repo add `eosio.helm` public repository.
     1. Set Kubernetes to use the Docker Desktop context.
-1. Deploy Nodeos.
-    1. Perform `helm dependency update` for chain.
+        1. Verify the current context using `kubectl config current-context`.
+        1. If the current context is not Docker Desktop, then
+            1. Get a list of contexts via `kubectl config get-contexts`.
+            1. Set the current context to the Docker Desktop Kubernetes namespace via `kubectl config use-context <docker local>`.
+1. Deploy a Helm Chart for EOSIO applications.
+    1. Configure Helm Chart subpackages via `helm dependency update`.
         * [Code: eosio/scripts/helm-dependency-update.sh](eosio/scripts/helm-dependency-update.sh)
-    1. Perform `helm upgrade --install eosio eosio -f eosio/local.yaml -f eosio/nodeos_config.yaml`
+    1. Deploy EOSIO via `helm upgrade --install eosio eosio -f eosio/local.yaml -f eosio/nodeos_config.yaml`
         * [Code: eosio/local.yaml](eosio/local.yaml)
         * [Code: eosio/nodeos_config.yaml](eosio/nodeos_config.yaml)
 
-### How to install using a cloud provider like AWS or GCP.
+## How to install using a cloud provider like AWS or GCP.
 
 1. Perform `helm dependency update` for chain.
     * [Code: eosio/scripts/helm-dependency-update.sh](eosio/scripts/helm-dependency-update.sh)
